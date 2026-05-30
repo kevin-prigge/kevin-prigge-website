@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
   <style>
     /* ---- Deployment map section ---- */
     #deployment-map {
@@ -81,23 +81,9 @@
     .deploy-legend-item { display: flex; align-items: center; gap: .4rem; font-size: .77rem; color: #6B5A4A; }
     .deploy-swatch { width: 28px; height: 14px; border-radius: 3px; border: 1px solid rgba(122,92,62,.3); }
     .deploy-legend-note { font-size: .77rem; color: #9C8670; font-style: italic; }
-    /* Leaflet popup theme */
-    .leaflet-popup-content-wrapper {
-      background: #2a1f14;
-      border: 1px solid rgba(184,149,106,.35);
-      border-radius: 8px;
-      box-shadow: 0 4px 20px rgba(0,0,0,.4);
-    }
-    .leaflet-popup-tip { background: #2a1f14; }
-    .leaflet-popup-content { color: #FAF8F4; font-family: 'Inter', sans-serif; margin: 10px 15px; }
-    .map-pop-country { font-weight: 700; font-size: .95rem; color: #B8956A; margin-bottom: .2rem; }
-    .map-pop-count { font-size: .82rem; color: rgba(250,248,244,.55); }
-    .leaflet-control-attribution { display: none !important; }
-    .leaflet-control-zoom a {
-      background: rgba(250,248,244,.96) !important;
-      border-color: #DDD3C5 !important;
-      color: #3D2B1F !important;
-    }
+    /* amCharts logo hide */
+    [class*="amcharts-amexport"] { display: none !important; }
+    #deployment-map a[href*="amcharts"] { display: none !important; }
     @media (max-width: 900px) {
       #deployment-map { height: 400px; }
       .deploy-bar { justify-content: center; }
@@ -557,127 +543,126 @@
   </footer>
 
   <script src="assets/js/main.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN2GGm0=" crossorigin=""></script>
-  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
+  <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
   <script>
   (function () {
-    var el = document.getElementById('deployment-map');
-    if (!el) return;
+    if (!window.am5 || !window.am5map || !window.am5geodata_worldLow) return;
 
-    // ISO numeric → deployment data
-    var deployed = {
-      "710": { name: "South Africa",   count: 1 },
-      "826": { name: "United Kingdom", count: 5 }, // UK incl. Guernsey
-      "276": { name: "Germany",        count: 2 },
-      "616": { name: "Poland",         count: 3 },
-      "578": { name: "Norway",         count: 1 },
-      "40":  { name: "Austria",        count: 1 },
-      "703": { name: "Slovakia",       count: 1 },
-      "156": { name: "China",          count: 2 },
-      "512": { name: "Oman",           count: 6 },
-      "268": { name: "Georgia",        count: 1 },
-      "31":  { name: "Azerbaijan",     count: 1 },
-      "380": { name: "Italy",          count: 1 },
-      "368": { name: "Iraq",           count: 1 },
-      "682": { name: "Saudi Arabia",   count: 1 },
-      "72":  { name: "Botswana",       count: 1 },
-      "620": { name: "Portugal",       count: 1 },
-      "376": { name: "Israel",         count: 2 },
-      "764": { name: "Thailand",       count: 1 },
-      "442": { name: "Luxembourg",     count: 1 }
-    };
+    var root = am5.Root.new('deployment-map');
+    root.setThemes([am5themes_Animated.new(root)]);
 
-    function deployColor(n) {
-      if (n >= 6) return '#8B6A3A';
-      if (n >= 4) return '#B8956A';
-      if (n >= 2) return '#C9A97C';
-      return '#D4BFA0';
-    }
+    // Hide the amCharts watermark link
+    root.interfaceColors.set('grid', am5.color(0x3D3020));
 
-    var map = L.map('deployment-map', {
-      center: [25, 20],
-      zoom: 2,
-      zoomControl: true,
-      scrollWheelZoom: false,
-      minZoom: 1,
-      maxZoom: 8
+    var chart = root.container.children.push(
+      am5map.MapChart.new(root, {
+        projection: am5map.geoNaturalEarth1(),
+        panX: 'translateX',
+        panY: 'translateY',
+        wheelY: 'none',
+        maxZoomLevel: 8,
+        homeGeoPoint: { longitude: 20, latitude: 20 },
+        homeZoomLevel: 1.2
+      })
+    );
+
+    chart.chartContainer.get('background').setAll({
+      fill: am5.color(0x1A1208),
+      fillOpacity: 1
     });
 
-    // Dark base — no labels
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
-      maxZoom: 19
-    }).addTo(map);
+    // ISO alpha-2 → deployment count
+    var counts = {
+      ZA: 1, GB: 5, DE: 2, PL: 3, NO: 1, AT: 1, SK: 1,
+      CN: 2, OM: 6, GE: 1, AZ: 1, IT: 1, IQ: 1,
+      SA: 1, BW: 1, PT: 1, IL: 2, TH: 1, LU: 1
+    };
 
-    // Labels pane on top of country fills
-    map.createPane('labels');
-    map.getPane('labels').style.zIndex = 650;
-    map.getPane('labels').style.pointerEvents = 'none';
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-      subdomains: 'abcd',
-      maxZoom: 19,
-      pane: 'labels'
-    }).addTo(map);
+    function deployColor(v) {
+      if (v >= 6) return am5.color(0x8B6A3A);
+      if (v >= 4) return am5.color(0xB8956A);
+      if (v >= 2) return am5.color(0xC9A97C);
+      return am5.color(0xD4BFA0);
+    }
 
-    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json')
-      .then(function (r) { return r.json(); })
-      .then(function (world) {
-        var features = topojson.feature(world, world.objects.countries);
-        var layer;
-        layer = L.geoJSON(features, {
-          style: function (feature) {
-            var id = String(feature.id);
-            var d = deployed[id];
-            if (d) {
-              return {
-                fillColor: deployColor(d.count),
-                fillOpacity: 0.85,
-                color: '#F0D9B5',
-                weight: 1,
-                opacity: 0.75
-              };
-            }
-            return {
-              fillColor: '#2C2010',
-              fillOpacity: 0.65,
-              color: '#3D3020',
-              weight: 0.4,
-              opacity: 0.7
-            };
-          },
-          onEachFeature: function (feature, fl) {
-            var id = String(feature.id);
-            var d = deployed[id];
-            if (!d) return;
-            var label = d.count === 1 ? '1 deployment' : d.count + ' deployments';
-            fl.bindPopup(
-              '<div class="map-pop-country">' + d.name + '</div>' +
-              '<div class="map-pop-count">' + label + '</div>',
-              { closeButton: false, offset: [0, -4] }
-            );
-            fl.on('mouseover', function (e) {
-              e.target.setStyle({ fillOpacity: 1, weight: 2, color: '#F0D9B5' });
-              e.target.openPopup(e.latlng);
-            });
-            fl.on('mouseout', function (e) {
-              layer.resetStyle(e.target);
-              e.target.closePopup();
-            });
-            fl.on('click', function (e) {
-              e.target.openPopup(e.latlng);
-            });
-          }
-        }).addTo(map);
+    var data = Object.keys(counts).map(function (id) {
+      var c = counts[id];
+      return { id: id, count: c, deployLabel: c + (c === 1 ? ' deployment' : ' deployments') };
+    });
+
+    var polygonSeries = chart.series.push(
+      am5map.MapPolygonSeries.new(root, {
+        geoJSON: am5geodata_worldLow
       })
-      .catch(function () {
-        el.style.display = 'flex';
-        el.style.alignItems = 'center';
-        el.style.justifyContent = 'center';
-        el.style.background = '#2C2010';
-        el.style.color = 'rgba(250,248,244,.4)';
-        el.style.fontSize = '.85rem';
-        el.textContent = 'Map unavailable — check network connection.';
-      });
+    );
+
+    polygonSeries.data.setAll(data);
+
+    polygonSeries.mapPolygons.template.setAll({
+      fill: am5.color(0x2C1F0E),
+      fillOpacity: 0.7,
+      stroke: am5.color(0x3D3020),
+      strokeWidth: 0.4,
+      strokeOpacity: 0.7,
+      interactive: true,
+      tooltipText: '{name}'
+    });
+
+    polygonSeries.mapPolygons.template.states.create('hover', {
+      stroke: am5.color(0xF0D9B5),
+      strokeWidth: 1.5,
+      strokeOpacity: 1
+    });
+
+    // Fill deployed countries
+    polygonSeries.mapPolygons.template.adapters.add('fill', function (fill, target) {
+      var di = target.dataItem;
+      if (di && di.dataContext && di.dataContext.count) {
+        return deployColor(di.dataContext.count);
+      }
+      return am5.color(0x2C1F0E);
+    });
+
+    polygonSeries.mapPolygons.template.adapters.add('fillOpacity', function (op, target) {
+      var di = target.dataItem;
+      if (di && di.dataContext && di.dataContext.count) return 0.88;
+      return 0.65;
+    });
+
+    // Tooltip text — show count for deployed, just name otherwise
+    polygonSeries.mapPolygons.template.adapters.add('tooltipText', function (text, target) {
+      var di = target.dataItem;
+      if (!di) return text;
+      var ctx = di.dataContext;
+      if (ctx && ctx.count) {
+        return (ctx.name || '') + '\n[fontSize: 12px #C4A882]' + ctx.deployLabel + '[/]';
+      }
+      return ctx && ctx.name ? ctx.name : text;
+    });
+
+    // Style tooltip
+    polygonSeries.set('tooltip', am5.Tooltip.new(root, {
+      getFillFromSprite: false,
+      getStrokeFromSprite: false,
+      labelText: '{name}'
+    }));
+    polygonSeries.get('tooltip').get('background').setAll({
+      fill: am5.color(0x2A1F14),
+      stroke: am5.color(0xB8956A),
+      strokeWidth: 1,
+      cornerRadiusBL: 6, cornerRadiusBR: 6,
+      cornerRadiusTL: 6, cornerRadiusTR: 6
+    });
+    polygonSeries.get('tooltip').label.setAll({
+      fill: am5.color(0xFAF8F4),
+      fontSize: 13,
+      fontFamily: "'Inter', sans-serif"
+    });
+
+    chart.appear(1000, 100);
   }());
   </script>
 </body>
