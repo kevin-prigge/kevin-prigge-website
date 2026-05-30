@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kevin Prigge — Systems Engineer</title>
+  <meta name="description" content="Systems Engineer specializing in system integration. Portfolio, projects, and contact." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    /* ---- Deployment map section ---- */
+    #deployment-map {
+      height: 560px;
+      border-radius: 12px;
+      border: 1px solid rgba(61,43,31,.15);
+      margin-top: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(61,43,31,.1);
+    }
+    .deploy-bar {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      background: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 3px rgba(61,43,31,.07);
+    }
+    .deploy-stat { text-align: center; }
+    .deploy-num {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #7A5C3E;
+      line-height: 1;
+    }
+    .deploy-label {
+      display: block;
+      font-size: .7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: #9C8670;
+      margin-top: .25rem;
+    }
+    .deploy-divider { width: 1px; height: 36px; background: #DDD3C5; flex-shrink: 0; }
+    .deploy-chips { display: flex; gap: .55rem; flex-wrap: wrap; margin-bottom: .25rem; }
+    .deploy-chip {
+      padding: .28rem .82rem;
+      border-radius: 20px;
+      font-size: .73rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+    }
+    .chip-europe  { border: 1px solid rgba(107,154,213,.4); color: rgba(107,154,213,.9); background: rgba(107,154,213,.07); }
+    .chip-mideast { border: 1px solid rgba(213,174,107,.4); color: rgba(213,174,107,.9); background: rgba(213,174,107,.07); }
+    .chip-asia    { border: 1px solid rgba(107,213,154,.4); color: rgba(107,213,154,.9); background: rgba(107,213,154,.07); }
+    .chip-africa  { border: 1px solid rgba(213,107,107,.4); color: rgba(213,107,107,.9); background: rgba(213,107,107,.07); }
+    .deploy-legend {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .deploy-legend-title {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: #9C8670;
+    }
+    .deploy-legend-scale { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+    .deploy-legend-item { display: flex; align-items: center; gap: .4rem; font-size: .77rem; color: #6B5A4A; }
+    .deploy-swatch { width: 28px; height: 14px; border-radius: 3px; border: 1px solid rgba(122,92,62,.3); }
+    .deploy-legend-note { font-size: .77rem; color: #9C8670; font-style: italic; }
+    /* Leaflet popup theme */
+    .leaflet-popup-content-wrapper {
+      background: #2a1f14;
+      border: 1px solid rgba(184,149,106,.35);
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    }
+    .leaflet-popup-tip { background: #2a1f14; }
+    .leaflet-popup-content { color: #FAF8F4; font-family: 'Inter', sans-serif; margin: 10px 15px; }
+    .map-pop-country { font-weight: 700; font-size: .95rem; color: #B8956A; margin-bottom: .2rem; }
+    .map-pop-count { font-size: .82rem; color: rgba(250,248,244,.55); }
+    .leaflet-control-attribution { display: none !important; }
+    .leaflet-control-zoom a {
+      background: rgba(250,248,244,.96) !important;
+      border-color: #DDD3C5 !important;
+      color: #3D2B1F !important;
+    }
+    @media (max-width: 900px) {
+      #deployment-map { height: 400px; }
+      .deploy-bar { justify-content: center; }
+      .deploy-divider { display: none; }
+    }
+    @media (max-width: 640px) {
+      #deployment-map { height: 300px; }
+      .deploy-bar { padding: 1rem 1.25rem; gap: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAV ===== -->
+  <header class="site-header" id="top">
+    <nav class="nav container">
+      <a href="#hero" class="nav-logo">KP</a>
+      <ul class="nav-links">
+        <li><a href="index.html">&#x2190; Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#deployments">Deployments</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#contact" class="btn btn-outline">Contact</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="hero">
+      <div class="container hero-inner">
+        <div class="hero-text">
+          <p class="hero-eyebrow">Systems Engineer</p>
+          <h1 class="hero-name">Kevin Prigge</h1>
+          <p class="hero-tagline">Integrating complex systems — from concept through deployment.</p>
+          <div class="hero-actions">
+            <a href="#deployments" class="btn btn-primary">View My Work</a>
+            <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+          </div>
+          <div class="hero-socials">
+            <a href="https://linkedin.com/in/kevinprigge" target="_blank" rel="noopener" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="https://github.com/kevin-prigge" target="_blank" rel="noopener" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+            <a href="mailto:kevin@example.com" aria-label="Email">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="hero-avatar">
+          <div class="avatar-placeholder">
+            <span>KP</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-scroll-hint">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- ===== ABOUT ===== -->
+    <section class="section about" id="about">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">About Me</h2>
+          <div class="section-rule"></div>
+        </div>
+        <div class="about-grid">
+          <div class="about-text">
+            <p class="lead">I'm a Systems Engineer focused on system integration — bridging hardware, software, and process to deliver solutions that actually work end-to-end.</p>
+            <p>With experience spanning [your industries here], I specialize in taking complex requirements and translating them into integrated, reliable systems. Whether it's coordinating across disciplines, managing interfaces, or ensuring everything clicks together at deployment — that's where I thrive.</p>
+            <p>Outside of work I'm [hobbies / personal note here].</p>
+            <a href="assets/pdf/kevin-prigge-resume.pdf" target="_blank" class="btn btn-primary">Download Resume</a>
+          </div>
+          <div class="about-stats">
+            <div class="stat-card">
+              <span class="stat-number">X+</span>
+              <span class="stat-label">Years Experience</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">X+</span>
+              <span class="stat-label">Projects Delivered</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">X+</span>
+              <span class="stat-label">Systems Integrated</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-number">X+</span>
+              <span class="stat-label">Disciplines Bridged</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== EXPERIENCE ===== -->
+    <section class="section experience bg-tinted" id="experience">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Experience</h2>
+          <div class="section-rule"></div>
+        </div>
+        <div class="timeline">
+
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div>
+                  <h3 class="job-title">Systems Engineer</h3>
+                  <p class="company">Company Name</p>
+                </div>
+                <span class="date-badge">20XX – Present</span>
+              </div>
+              <ul class="job-bullets">
+                <li>Led integration of [subsystems] across [program/project], reducing interface issues by X%.</li>
+                <li>Coordinated with hardware, software, and operations teams to define and manage system interfaces.</li>
+                <li>Developed and maintained system requirements, test plans, and integration documentation.</li>
+              </ul>
+              <div class="job-tags">
+                <span class="tag">System Integration</span>
+                <span class="tag">Requirements Mgmt</span>
+                <span class="tag">Interface Control</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div>
+                  <h3 class="job-title">Previous Role</h3>
+                  <p class="company">Company Name</p>
+                </div>
+                <span class="date-badge">20XX – 20XX</span>
+              </div>
+              <ul class="job-bullets">
+                <li>Describe key responsibilities and achievements here.</li>
+                <li>Quantify impact wherever possible — numbers stand out.</li>
+                <li>Keep bullets action-oriented: built, led, designed, reduced, improved.</li>
+              </ul>
+              <div class="job-tags">
+                <span class="tag">Skill / Tool</span>
+                <span class="tag">Skill / Tool</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div>
+                  <h3 class="job-title">Earlier Role</h3>
+                  <p class="company">Company Name</p>
+                </div>
+                <span class="date-badge">20XX – 20XX</span>
+              </div>
+              <ul class="job-bullets">
+                <li>Early career achievement or responsibility.</li>
+                <li>Additional context on growth and learning.</li>
+              </ul>
+              <div class="job-tags">
+                <span class="tag">Skill / Tool</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SKILLS ===== -->
+    <section class="section skills" id="skills">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Skills</h2>
+          <div class="section-rule"></div>
+        </div>
+        <div class="skills-grid">
+
+          <div class="skill-group">
+            <h3 class="skill-group-title">Systems Engineering</h3>
+            <ul class="skill-list">
+              <li class="skill-item">
+                <span class="skill-name">System Integration</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 95%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">Requirements Management</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 90%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">Interface Control Documents</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 85%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">Verification & Validation</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 80%"></div></div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="skill-group">
+            <h3 class="skill-group-title">Tools & Platforms</h3>
+            <ul class="skill-list">
+              <li class="skill-item">
+                <span class="skill-name">Tool / Platform Name</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 88%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">Tool / Platform Name</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 82%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">Tool / Platform Name</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 75%"></div></div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="skill-group">
+            <h3 class="skill-group-title">Technical</h3>
+            <ul class="skill-list">
+              <li class="skill-item">
+                <span class="skill-name">Technical Skill</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 80%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">Technical Skill</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 70%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">Technical Skill</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 65%"></div></div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="skill-group">
+            <h3 class="skill-group-title">Soft Skills</h3>
+            <div class="pill-group">
+              <span class="pill">Cross-functional Leadership</span>
+              <span class="pill">Technical Communication</span>
+              <span class="pill">Stakeholder Management</span>
+              <span class="pill">Problem Solving</span>
+              <span class="pill">Project Coordination</span>
+              <span class="pill">Documentation</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GLOBAL DEPLOYMENTS ===== -->
+    <section class="section deployments bg-tinted" id="deployments">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Global Deployments</h2>
+          <div class="section-rule"></div>
+          <p class="section-sub">Systems live and operational across 20 countries — spanning four continents.</p>
+        </div>
+
+        <!-- Stats bar -->
+        <div class="deploy-bar">
+          <div class="deploy-stat">
+            <span class="deploy-num">40+</span>
+            <span class="deploy-label">Projects Deployed</span>
+          </div>
+          <div class="deploy-divider"></div>
+          <div class="deploy-stat">
+            <span class="deploy-num">20</span>
+            <span class="deploy-label">Countries</span>
+          </div>
+          <div class="deploy-divider"></div>
+          <div class="deploy-stat">
+            <span class="deploy-num">4</span>
+            <span class="deploy-label">Continents</span>
+          </div>
+          <div class="deploy-divider"></div>
+          <div class="deploy-stat">
+            <span class="deploy-num" style="font-size:1rem;font-family:'Inter',sans-serif;">Rail &middot; Cities &middot; National</span>
+            <span class="deploy-label">Programme Types</span>
+          </div>
+        </div>
+
+        <!-- Region chips -->
+        <div class="deploy-chips">
+          <span class="deploy-chip chip-europe">&#x25CF; Europe</span>
+          <span class="deploy-chip chip-mideast">&#x25CF; Middle East</span>
+          <span class="deploy-chip chip-asia">&#x25CF; Asia</span>
+          <span class="deploy-chip chip-africa">&#x25CF; Africa</span>
+        </div>
+
+        <!-- Choropleth map -->
+        <div id="deployment-map"></div>
+
+        <!-- Legend -->
+        <div class="deploy-legend">
+          <span class="deploy-legend-title">Deployment density</span>
+          <div class="deploy-legend-scale">
+            <div class="deploy-legend-item">
+              <div class="deploy-swatch" style="background:#D4BFA0"></div>
+              <span>1</span>
+            </div>
+            <div class="deploy-legend-item">
+              <div class="deploy-swatch" style="background:#C9A97C"></div>
+              <span>2&ndash;3</span>
+            </div>
+            <div class="deploy-legend-item">
+              <div class="deploy-swatch" style="background:#B8956A"></div>
+              <span>4&ndash;5</span>
+            </div>
+            <div class="deploy-legend-item">
+              <div class="deploy-swatch" style="background:#8B6A3A"></div>
+              <span>6+</span>
+            </div>
+          </div>
+          <span class="deploy-legend-note">Hover a highlighted country to explore</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== EDUCATION ===== -->
+    <section class="section education" id="education">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Education</h2>
+          <div class="section-rule"></div>
+        </div>
+        <div class="edu-grid">
+
+          <div class="edu-card">
+            <div class="edu-icon">🎓</div>
+            <div class="edu-body">
+              <h3 class="edu-degree">Degree — Field of Study</h3>
+              <p class="edu-school">University Name</p>
+              <p class="edu-date">20XX – 20XX</p>
+              <p class="edu-note">Relevant coursework, honors, or activities here.</p>
+            </div>
+          </div>
+
+          <div class="edu-card">
+            <div class="edu-icon">📜</div>
+            <div class="edu-body">
+              <h3 class="edu-degree">Certification Name</h3>
+              <p class="edu-school">Issuing Organization</p>
+              <p class="edu-date">Issued 20XX</p>
+              <p class="edu-note">Brief note about this certification and its relevance.</p>
+            </div>
+          </div>
+
+          <div class="edu-card">
+            <div class="edu-icon">📜</div>
+            <div class="edu-body">
+              <h3 class="edu-degree">Certification Name</h3>
+              <p class="edu-school">Issuing Organization</p>
+              <p class="edu-date">Issued 20XX</p>
+              <p class="edu-note">Brief note about this certification and its relevance.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section class="section contact bg-tinted" id="contact">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Get in Touch</h2>
+          <div class="section-rule"></div>
+          <p class="section-sub">Whether it's a project, an opportunity, or just a conversation — reach out.</p>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-info">
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              </div>
+              <div>
+                <p class="contact-label">Email</p>
+                <a href="mailto:kevin@example.com" class="contact-value">kevin@example.com</a>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </div>
+              <div>
+                <p class="contact-label">LinkedIn</p>
+                <a href="https://linkedin.com/in/kevinprigge" target="_blank" rel="noopener" class="contact-value">linkedin.com/in/kevinprigge</a>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              </div>
+              <div>
+                <p class="contact-label">Location</p>
+                <p class="contact-value">Your City, State</p>
+              </div>
+            </div>
+          </div>
+
+          <form class="contact-form" id="contactForm" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Your name" required />
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="subject">Subject</label>
+              <input type="text" id="subject" name="subject" placeholder="What's this about?" required />
+            </div>
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="5" placeholder="Your message..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">Send Message</button>
+            <p class="form-status" id="formStatus" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-copy">&copy; <span id="year"></span> Kevin Prigge. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#hero">Back to top ↑</a>
+        <a href="https://linkedin.com/in/kevinprigge" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/kevin-prigge" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN2GGm0=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script>
+  (function () {
+    var el = document.getElementById('deployment-map');
+    if (!el) return;
+
+    // ISO numeric → deployment data
+    var deployed = {
+      "710": { name: "South Africa",   count: 1 },
+      "826": { name: "United Kingdom", count: 5 }, // UK incl. Guernsey
+      "276": { name: "Germany",        count: 2 },
+      "616": { name: "Poland",         count: 3 },
+      "578": { name: "Norway",         count: 1 },
+      "40":  { name: "Austria",        count: 1 },
+      "703": { name: "Slovakia",       count: 1 },
+      "156": { name: "China",          count: 2 },
+      "512": { name: "Oman",           count: 6 },
+      "268": { name: "Georgia",        count: 1 },
+      "31":  { name: "Azerbaijan",     count: 1 },
+      "380": { name: "Italy",          count: 1 },
+      "368": { name: "Iraq",           count: 1 },
+      "682": { name: "Saudi Arabia",   count: 1 },
+      "72":  { name: "Botswana",       count: 1 },
+      "620": { name: "Portugal",       count: 1 },
+      "376": { name: "Israel",         count: 2 },
+      "764": { name: "Thailand",       count: 1 },
+      "442": { name: "Luxembourg",     count: 1 }
+    };
+
+    function deployColor(n) {
+      if (n >= 6) return '#8B6A3A';
+      if (n >= 4) return '#B8956A';
+      if (n >= 2) return '#C9A97C';
+      return '#D4BFA0';
+    }
+
+    var map = L.map('deployment-map', {
+      center: [25, 20],
+      zoom: 2,
+      zoomControl: true,
+      scrollWheelZoom: false,
+      minZoom: 1,
+      maxZoom: 8
+    });
+
+    // Dark base — no labels
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(map);
+
+    // Labels pane on top of country fills
+    map.createPane('labels');
+    map.getPane('labels').style.zIndex = 650;
+    map.getPane('labels').style.pointerEvents = 'none';
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd',
+      maxZoom: 19,
+      pane: 'labels'
+    }).addTo(map);
+
+    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json')
+      .then(function (r) { return r.json(); })
+      .then(function (world) {
+        var features = topojson.feature(world, world.objects.countries);
+        var layer;
+        layer = L.geoJSON(features, {
+          style: function (feature) {
+            var id = String(feature.id);
+            var d = deployed[id];
+            if (d) {
+              return {
+                fillColor: deployColor(d.count),
+                fillOpacity: 0.85,
+                color: '#F0D9B5',
+                weight: 1,
+                opacity: 0.75
+              };
+            }
+            return {
+              fillColor: '#2C2010',
+              fillOpacity: 0.65,
+              color: '#3D3020',
+              weight: 0.4,
+              opacity: 0.7
+            };
+          },
+          onEachFeature: function (feature, fl) {
+            var id = String(feature.id);
+            var d = deployed[id];
+            if (!d) return;
+            var label = d.count === 1 ? '1 deployment' : d.count + ' deployments';
+            fl.bindPopup(
+              '<div class="map-pop-country">' + d.name + '</div>' +
+              '<div class="map-pop-count">' + label + '</div>',
+              { closeButton: false, offset: [0, -4] }
+            );
+            fl.on('mouseover', function (e) {
+              e.target.setStyle({ fillOpacity: 1, weight: 2, color: '#F0D9B5' });
+              e.target.openPopup(e.latlng);
+            });
+            fl.on('mouseout', function (e) {
+              layer.resetStyle(e.target);
+              e.target.closePopup();
+            });
+            fl.on('click', function (e) {
+              e.target.openPopup(e.latlng);
+            });
+          }
+        }).addTo(map);
+      })
+      .catch(function () {
+        el.style.display = 'flex';
+        el.style.alignItems = 'center';
+        el.style.justifyContent = 'center';
+        el.style.background = '#2C2010';
+        el.style.color = 'rgba(250,248,244,.4)';
+        el.style.fontSize = '.85rem';
+        el.textContent = 'Map unavailable — check network connection.';
+      });
+  }());
+  </script>
+</body>
+</html>
