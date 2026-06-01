@@ -13,12 +13,49 @@
   <style>
     /* ---- Deployment map section ---- */
     #deployment-map {
-      height: 560px;
+      height: 440px;
       border-radius: 12px;
       border: 1px solid rgba(61,43,31,.15);
       margin-top: 1.5rem;
       overflow: hidden;
       box-shadow: 0 4px 16px rgba(61,43,31,.1);
+      position: relative;
+    }
+    .deploy-tooltip {
+      position: absolute;
+      z-index: 5;
+      min-width: 130px;
+      max-width: 220px;
+      padding: .55rem .7rem;
+      background: #F5EEE4;
+      border: 1px solid #B8956A;
+      border-radius: 7px;
+      box-shadow: 0 6px 18px rgba(26,18,8,.18);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(12px, 12px);
+      transition: opacity .12s ease;
+    }
+    .deploy-tooltip.is-visible {
+      opacity: 1;
+    }
+    .deploy-tooltip-name {
+      display: block;
+      color: #3D2B1F;
+      font-size: .82rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .deploy-tooltip-count {
+      display: block;
+      color: #7A5C3E;
+      font-size: .73rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-top: .15rem;
+    }
+    .deploy-tooltip-count.is-empty {
+      color: #9C8670;
     }
     .deploy-bar {
       display: flex;
@@ -106,6 +143,8 @@
         <li><a href="#about">About</a></li>
         <li><a href="#experience">Experience</a></li>
         <li><a href="#skills">Skills</a></li>
+        <li><a href="#infrastructure">Infrastructure</a></li>
+        <li><a href="#projects">Portfolio</a></li>
         <li><a href="#deployments">Deployments</a></li>
         <li><a href="#education">Education</a></li>
         <li><a href="#contact" class="btn btn-outline">Contact</a></li>
@@ -437,16 +476,24 @@
             <h3 class="skill-group-title">Tools & Platforms</h3>
             <ul class="skill-list">
               <li class="skill-item">
-                <span class="skill-name">Tool / Platform Name</span>
+                <span class="skill-name">GitHub Copilot</span>
                 <div class="skill-bar"><div class="skill-fill" style="--fill: 88%"></div></div>
               </li>
               <li class="skill-item">
-                <span class="skill-name">Tool / Platform Name</span>
+                <span class="skill-name">Visual Studio Code</span>
                 <div class="skill-bar"><div class="skill-fill" style="--fill: 82%"></div></div>
               </li>
               <li class="skill-item">
-                <span class="skill-name">Tool / Platform Name</span>
+                <span class="skill-name">Windows / Windows Server</span>
                 <div class="skill-bar"><div class="skill-fill" style="--fill: 75%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">macOS</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 80%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">Linux</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 78%"></div></div>
               </li>
             </ul>
           </div>
@@ -455,16 +502,24 @@
             <h3 class="skill-group-title">Technical</h3>
             <ul class="skill-list">
               <li class="skill-item">
-                <span class="skill-name">Technical Skill</span>
+                <span class="skill-name">Python</span>
                 <div class="skill-bar"><div class="skill-fill" style="--fill: 80%"></div></div>
               </li>
               <li class="skill-item">
-                <span class="skill-name">Technical Skill</span>
+                <span class="skill-name">Java</span>
                 <div class="skill-bar"><div class="skill-fill" style="--fill: 70%"></div></div>
               </li>
               <li class="skill-item">
-                <span class="skill-name">Technical Skill</span>
+                <span class="skill-name">Swift</span>
                 <div class="skill-bar"><div class="skill-fill" style="--fill: 65%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">HTML / CSS</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 82%"></div></div>
+              </li>
+              <li class="skill-item">
+                <span class="skill-name">JavaScript</span>
+                <div class="skill-bar"><div class="skill-fill" style="--fill: 72%"></div></div>
               </li>
             </ul>
           </div>
@@ -481,6 +536,176 @@
             </div>
           </div>
 
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== INFRASTRUCTURE PLATFORMS ===== -->
+    <section class="section infrastructure bg-tinted" id="infrastructure">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Infrastructure Platforms</h2>
+          <div class="section-rule"></div>
+          <p class="section-sub">Hands-on experience with enterprise networking, server, virtualization, security, timing, and directory platforms.</p>
+        </div>
+
+        <div class="infra-grid">
+          <article class="infra-card">
+            <h3 class="infra-title">Networking &amp; Security</h3>
+            <div class="pill-group">
+              <span class="pill">HPE Aruba Switches</span>
+              <span class="pill">Fortinet Firewalls</span>
+              <span class="pill">Fortinet FortiManager</span>
+            </div>
+          </article>
+
+          <article class="infra-card">
+            <h3 class="infra-title">Server Hardware</h3>
+            <div class="pill-group">
+              <span class="pill">HPE Servers</span>
+              <span class="pill">Dell Servers</span>
+            </div>
+          </article>
+
+          <article class="infra-card">
+            <h3 class="infra-title">Virtualization</h3>
+            <div class="pill-group">
+              <span class="pill">VMware ESXi</span>
+              <span class="pill">Red Hat KVM</span>
+            </div>
+          </article>
+
+          <article class="infra-card">
+            <h3 class="infra-title">Core Services</h3>
+            <div class="pill-group">
+              <span class="pill">Windows Active Directory</span>
+              <span class="pill">SyncServer Time Servers</span>
+              <span class="pill">FreePBX</span>
+              <span class="pill">Frigate</span>
+            </div>
+          </article>
+
+          <article class="infra-card">
+            <h3 class="infra-title">Tooling &amp; Collaboration</h3>
+            <div class="pill-group">
+              <span class="pill">Docker</span>
+              <span class="pill">GitHub</span>
+              <span class="pill">Atlassian Confluence</span>
+              <span class="pill">Atlassian Jira</span>
+              <span class="pill">Atlassian Bitbucket</span>
+            </div>
+          </article>
+
+          <article class="infra-card">
+            <h3 class="infra-title">AI &amp; Developer Assistants</h3>
+            <div class="pill-group">
+              <span class="pill">Claude</span>
+              <span class="pill">ChatGPT</span>
+              <span class="pill">Codex</span>
+              <span class="pill">GitHub Copilot</span>
+              <span class="pill">GitHub Copilot CLI</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PROJECTS & HOBBIES ===== -->
+    <section class="section projects" id="projects">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Portfolio &amp; Hobbies</h2>
+          <div class="section-rule"></div>
+          <p class="section-sub">Practical software, automation, and infrastructure work outside my core systems engineering role.</p>
+        </div>
+
+        <div class="projects-grid">
+          <article class="project-card">
+            <div class="project-image placeholder-img">Website Preview</div>
+            <div class="project-body">
+              <h3 class="project-title">Website Design &amp; Development</h3>
+              <p class="project-desc">Designed and built the Midland Standard Engineering &amp; Testing website, including service pages, contact workflows, responsive layouts, and maintainable front-end structure.</p>
+              <div class="project-tags">
+                <span class="tag">HTML</span>
+                <span class="tag">CSS</span>
+                <span class="tag">JavaScript</span>
+                <span class="tag">Responsive Design</span>
+              </div>
+              <div class="project-links">
+                <a href="https://www.msetinc.com" target="_blank" rel="noopener" class="btn btn-sm btn-outline">Visit Site</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image placeholder-img">Automation Scripts</div>
+            <div class="project-body">
+              <h3 class="project-title">Network Automation Scripts</h3>
+              <p class="project-desc">Python tooling for repeatable network automation, server deployment, and network access tasks that reduce manual configuration work and improve operational consistency.</p>
+              <div class="project-tags">
+                <span class="tag">Python</span>
+                <span class="tag">Automation</span>
+                <span class="tag">Server Deployment</span>
+                <span class="tag">Networking</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image placeholder-img">Dashboard Preview</div>
+            <div class="project-body">
+              <h3 class="project-title">Data Analysis Dashboards</h3>
+              <p class="project-desc">Internal HTML dashboards for reviewing technical data, surfacing trends, and turning operational information into faster decision-making tools.</p>
+              <div class="project-tags">
+                <span class="tag">HTML</span>
+                <span class="tag">Data Analysis</span>
+                <span class="tag">Dashboards</span>
+                <span class="tag">Internal Tools</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image placeholder-img">macOS App</div>
+            <div class="project-body">
+              <h3 class="project-title">Scheduling Application</h3>
+              <p class="project-desc">A macOS scheduling application built in Swift to organize planning workflows, availability, and task timing in a native desktop interface.</p>
+              <div class="project-tags">
+                <span class="tag">Swift</span>
+                <span class="tag">macOS</span>
+                <span class="tag">Scheduling</span>
+                <span class="tag">Desktop App</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image placeholder-img">iOS App</div>
+            <div class="project-body">
+              <h3 class="project-title">SIP Water Drinking App</h3>
+              <p class="project-desc">An iOS application concept focused on simple water intake tracking, reminders, and daily hydration habits.</p>
+              <div class="project-tags">
+                <span class="tag">Swift</span>
+                <span class="tag">iOS</span>
+                <span class="tag">Mobile App</span>
+                <span class="tag">Health Tracking</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="project-image placeholder-img">Home Lab</div>
+            <div class="project-body">
+              <h3 class="project-title">Home Lab Infrastructure</h3>
+              <p class="project-desc">Maintained a home lab environment with NVR services, PBX configurations, local networking, and self-hosted infrastructure for practical experimentation.</p>
+              <div class="project-tags">
+                <span class="tag">Home Lab</span>
+                <span class="tag">NVR</span>
+                <span class="tag">PBX</span>
+                <span class="tag">Self-hosting</span>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -610,8 +835,14 @@
   (function () {
     if (!window.am5 || !window.am5map || !window.am5geodata_worldLow) return;
 
+    var mapEl = document.getElementById('deployment-map');
     var root = am5.Root.new('deployment-map');
     root.setThemes([am5themes_Animated.new(root)]);
+
+    var deployTooltip = document.createElement('div');
+    deployTooltip.className = 'deploy-tooltip';
+    deployTooltip.setAttribute('aria-hidden', 'true');
+    mapEl.appendChild(deployTooltip);
 
     // Hide the amCharts watermark link
     root.interfaceColors.set('grid', am5.color(0x3D3020));
@@ -691,30 +922,7 @@
       strokeOpacity: 1
     });
 
-    // Tooltip styling — light tan bg, earth-tone text
-    var tooltip = am5.Tooltip.new(root, {
-      getFillFromSprite: false,
-      getStrokeFromSprite: false,
-      labelText: '{name}'
-    });
-    tooltip.get('background').setAll({
-      fill: am5.color(0xF5EEE4),
-      fillOpacity: 1,
-      stroke: am5.color(0xB8956A),
-      strokeWidth: 1,
-      cornerRadiusBL: 7, cornerRadiusBR: 7,
-      cornerRadiusTL: 7, cornerRadiusTR: 7
-    });
-    tooltip.label.setAll({
-      fill: am5.color(0x3D2B1F),
-      fontSize: 13,
-      fontWeight: '600',
-      fontFamily: "'Inter', sans-serif"
-    });
-    polygonSeries.set('tooltip', tooltip);
-
     // Name overrides — fix geodata display names where needed
-    var nameOverrides = { IL: 'Israel' };
     var nameMap = {
       ZA:'South Africa', GB:'United Kingdom', DE:'Germany', PL:'Poland',
       NO:'Norway', AT:'Austria', SK:'Slovakia', CN:'China', OM:'Oman',
@@ -726,10 +934,11 @@
     // Per-country data — polygonSettings overrides visual props only
     var data = Object.keys(counts).map(function (id) {
       var c = counts[id];
+      var displayName = nameMap[id] || id;
       return {
         id: id,
         count: c,
-        name: nameMap[id] || id,
+        name: displayName,
         polygonSettings: {
           fill: deployColor(c),
           fillOpacity: 0.9,
@@ -741,16 +950,70 @@
 
     polygonSeries.data.setAll(data);
 
-    // Tooltip text — deployed countries get name + count, others get name only
-    polygonSeries.mapPolygons.template.adapters.add('tooltipText', function (text, target) {
-      var di = target.dataItem;
-      if (!di) return text;
-      var ctx = di.dataContext;
-      if (ctx && ctx.count) {
-        var label = ctx.count === 1 ? '1 deployment' : ctx.count + ' deployments';
-        return '[bold]' + ctx.name + '[/]\n[fontSize: 11px #7A5C3E]' + label + '[/]';
+    function applyCountryTooltipData() {
+      polygonSeries.mapPolygons.each(function (polygon) {
+        var di = polygon.dataItem;
+        var ctx = di && di.dataContext ? di.dataContext : {};
+        var id = ctx.id || (di && typeof di.get === 'function' ? di.get('id') : '');
+        var count = counts[id] || 0;
+        polygon.setPrivate('deployId', id);
+        polygon.setPrivate('deployName', nameMap[id] || ctx.name || id || 'Unknown');
+        polygon.setPrivate('deployCount', count);
+
+        if (!polygon.getPrivate('deployTooltipEventsBound')) {
+          polygon.events.on('pointerover', function (ev) {
+            showDeployTooltip(ev.target, ev.originalEvent);
+          });
+          polygon.events.on('pointerout', function () {
+            deployTooltip.classList.remove('is-visible');
+          });
+          polygon.setPrivate('deployTooltipEventsBound', true);
+        }
+      });
+    }
+
+    applyCountryTooltipData();
+    polygonSeries.events.on('datavalidated', applyCountryTooltipData);
+
+    function getCountryInfo(target) {
+      var id = target.getPrivate('deployId') || '';
+      var name = target.getPrivate('deployName') || nameMap[id] || id || 'Unknown';
+      var count = target.getPrivate('deployCount') || 0;
+
+      return {
+        name: name,
+        count: count,
+        countText: count === 1 ? '1 deployment' : count + ' deployments'
+      };
+    }
+
+    function moveDeployTooltip(originalEvent) {
+      if (!originalEvent) return;
+      var rect = mapEl.getBoundingClientRect();
+      var x = originalEvent.clientX - rect.left;
+      var y = originalEvent.clientY - rect.top;
+      deployTooltip.style.left = x + 'px';
+      deployTooltip.style.top = y + 'px';
+    }
+
+    function showDeployTooltip(target, originalEvent) {
+      var info = getCountryInfo(target);
+      var countClass = info.count ? 'deploy-tooltip-count' : 'deploy-tooltip-count is-empty';
+      deployTooltip.innerHTML =
+        '<span class="deploy-tooltip-name">' + info.name + '</span>' +
+        '<span class="' + countClass + '">' + (info.count ? info.countText : 'No networks') + '</span>';
+      moveDeployTooltip(originalEvent);
+      deployTooltip.classList.add('is-visible');
+    }
+
+    mapEl.addEventListener('pointermove', function (ev) {
+      if (deployTooltip.classList.contains('is-visible')) {
+        moveDeployTooltip(ev);
       }
-      return text;
+    });
+
+    mapEl.addEventListener('pointerleave', function () {
+      deployTooltip.classList.remove('is-visible');
     });
 
     polygonSeries.events.once('datavalidated', function () {

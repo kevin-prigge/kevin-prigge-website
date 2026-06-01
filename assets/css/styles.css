@@ -397,6 +397,10 @@ h1, h2, h3, h4 {
    ============================================================ */
 .timeline {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 2rem;
+  align-items: start;
   padding-left: 2rem;
 }
 .timeline::before {
@@ -410,6 +414,7 @@ h1, h2, h3, h4 {
 }
 
 .timeline-item {
+  grid-column: 1;
   position: relative;
   margin-bottom: 3rem;
 }
@@ -417,6 +422,7 @@ h1, h2, h3, h4 {
 
 /* Timeline section divider */
 .timeline-section-divider {
+  grid-column: 1;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -453,12 +459,27 @@ h1, h2, h3, h4 {
 
 /* Inline map embed inside timeline */
 .timeline-map-embed {
-  margin-left: -2rem;
-  margin-bottom: 3rem;
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  margin-left: 0;
+  margin-bottom: 0;
   background: var(--clr-bg-tint);
   border: 1px solid var(--clr-border);
   border-radius: var(--radius-md);
-  padding: 1.75rem 2rem;
+  padding: 1.5rem;
+}
+.timeline-map-embed .deploy-bar {
+  gap: 1rem;
+  padding: 1rem;
+}
+.timeline-map-embed .deploy-stat {
+  flex: 1 1 120px;
+}
+.timeline-map-embed .deploy-divider {
+  display: none;
+}
+.timeline-map-embed #deployment-map {
+  height: 440px;
 }
 
 .timeline-marker {
@@ -610,6 +631,35 @@ h1, h2, h3, h4 {
   transition: transform .8s cubic-bezier(.4,0,.2,1);
 }
 .skill-fill.animated { transform: scaleX(1); }
+
+/* ============================================================
+   INFRASTRUCTURE
+   ============================================================ */
+.infra-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.infra-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.infra-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+.infra-title {
+  font-family: var(--ff-body);
+  font-size: .85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--clr-caramel);
+  margin-bottom: 1rem;
+}
 
 /* ============================================================
    PROJECTS
@@ -857,6 +907,11 @@ a.contact-value:hover { color: var(--clr-brown-dark); text-decoration: underline
   .contact-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .skills-grid { grid-template-columns: 1fr; }
+  .timeline { display: block; }
+  .timeline-map-embed {
+    margin-left: -2rem;
+    margin-bottom: 3rem;
+  }
 }
 
 @media (max-width: 640px) {
@@ -874,6 +929,7 @@ a.contact-value:hover { color: var(--clr-brown-dark); text-decoration: underline
   .nav-toggle { display: flex; }
   .hero-actions { flex-direction: column; align-items: flex-start; }
   .timeline { padding-left: 1.25rem; }
+  .timeline-map-embed { margin-left: -1.25rem; }
   .timeline-header { flex-direction: column; gap: .5rem; }
   .skill-item { grid-template-columns: 1fr; gap: .25rem; }
 }

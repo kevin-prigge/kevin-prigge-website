@@ -58,7 +58,7 @@
 
   // ---------- Scroll reveal ----------
   const reveals = document.querySelectorAll(
-    '.timeline-item, .project-card, .stat-card, .edu-card, ' +
+    '.timeline-item, .project-card, .infra-card, .stat-card, .edu-card, ' +
     '.about-text, .about-stats, .skill-group, .contact-item, .contact-form'
   );
 
