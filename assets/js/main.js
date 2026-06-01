@@ -58,8 +58,8 @@
 
   // ---------- Scroll reveal ----------
   const reveals = document.querySelectorAll(
-    '.timeline-item, .project-card, .infra-card, .stat-card, .edu-card, ' +
-    '.about-text, .about-stats, .skill-group, .contact-item, .contact-form'
+    '.timeline-item, .project-card, .skill-card, .stat-card, .edu-card, ' +
+    '.about-text, .about-stats, .contact-item, .contact-form'
   );
 
   reveals.forEach(el => el.classList.add('reveal'));
@@ -79,20 +79,6 @@
   }, { threshold: 0.12 });
 
   reveals.forEach(el => revealObserver.observe(el));
-
-  // ---------- Skill bar animation ----------
-  const skillSection = document.getElementById('skills');
-  const skillFills = document.querySelectorAll('.skill-fill');
-
-  if (skillSection && skillFills.length) {
-    const skillObserver = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        skillFills.forEach(fill => fill.classList.add('animated'));
-        skillObserver.disconnect();
-      }
-    }, { threshold: 0.2 });
-    skillObserver.observe(skillSection);
-  }
 
   // ---------- Contact form ----------
   const form     = document.getElementById('contactForm');
