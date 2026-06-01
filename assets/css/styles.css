@@ -512,6 +512,10 @@ h1, h2, h3, h4 {
   margin-bottom: 1rem;
   flex-wrap: wrap;
 }
+.timeline-header > div:first-child {
+  flex: 1 1 0;
+  min-width: 0;
+}
 
 .job-title {
   font-size: 1.15rem;
