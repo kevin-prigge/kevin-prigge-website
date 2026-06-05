@@ -799,10 +799,26 @@
   <script src="https://cdn.amcharts.com/lib/5/geodata/worldLow.js"></script>
   <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
   <script>
-  (function () {
-    if (!window.am5 || !window.am5map || !window.am5geodata_worldLow) return;
-
+  (function initMap(attempt) {
     var mapEl = document.getElementById('deployment-map');
+    if (!mapEl) return;
+
+    if (!window.am5 || !window.am5map || !window.am5geodata_worldLow || !window.am5themes_Animated) {
+      if ((attempt || 0) < 40) {
+        setTimeout(function () { initMap((attempt || 0) + 1); }, 150);
+        return;
+      }
+
+      mapEl.innerHTML =
+        '<div style="height:100%;display:flex;align-items:center;justify-content:center;padding:1rem;text-align:center;color:#6B5A4A;background:#F5EEE4;border:1px solid rgba(61,43,31,.12);border-radius:12px;font-size:.9rem;line-height:1.5;">' +
+        'The deployment map is temporarily unavailable in this environment.' +
+        '</div>';
+      return;
+    }
+
+    if (mapEl.getAttribute('data-map-initialized') === 'true') return;
+    mapEl.setAttribute('data-map-initialized', 'true');
+
     var root = am5.Root.new('deployment-map');
     root.setThemes([am5themes_Animated.new(root)]);
 
