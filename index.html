@@ -803,7 +803,61 @@
     var mapEl = document.getElementById('deployment-map');
     if (!mapEl) return;
 
-    if (!window.am5 || !window.am5map || !window.am5geodata_worldLow || !window.am5themes_Animated) {
+    function loadScript(src, done) {
+      var existing = Array.prototype.find.call(document.scripts, function (s) {
+        return s.src === src;
+      });
+      if (existing) {
+        if (existing.getAttribute('data-loaded') === 'true') {
+          done();
+          return;
+        }
+        existing.addEventListener('load', function () { done(); }, { once: true });
+        existing.addEventListener('error', function () { done(); }, { once: true });
+        return;
+      }
+
+      var s = document.createElement('script');
+      s.src = src;
+      s.async = false;
+      s.defer = false;
+      s.addEventListener('load', function () {
+        s.setAttribute('data-loaded', 'true');
+        done();
+      }, { once: true });
+      s.addEventListener('error', function () { done(); }, { once: true });
+      document.head.appendChild(s);
+    }
+
+    function loadAmChartsDeps(onDone) {
+      var sources = [
+        'https://cdn.amcharts.com/lib/5/index.js',
+        'https://cdn.amcharts.com/lib/5/map.js',
+        'https://cdn.amcharts.com/lib/5/geodata/worldLow.js',
+        'https://cdn.amcharts.com/lib/5/themes/Animated.js'
+      ];
+      var i = 0;
+
+      function next() {
+        if (i >= sources.length) {
+          onDone();
+          return;
+        }
+        loadScript(sources[i], function () {
+          i += 1;
+          next();
+        });
+      }
+
+      next();
+    }
+
+    if (!window.am5 || !window.am5map || !window.am5geodata_worldLow) {
+      if ((attempt || 0) === 0) {
+        loadAmChartsDeps(function () { initMap(1); });
+        return;
+      }
+
       if ((attempt || 0) < 40) {
         setTimeout(function () { initMap((attempt || 0) + 1); }, 150);
         return;
@@ -820,7 +874,9 @@
     mapEl.setAttribute('data-map-initialized', 'true');
 
     var root = am5.Root.new('deployment-map');
-    root.setThemes([am5themes_Animated.new(root)]);
+    if (window.am5themes_Animated) {
+      root.setThemes([am5themes_Animated.new(root)]);
+    }
 
     var deployTooltip = document.createElement('div');
     deployTooltip.className = 'deploy-tooltip';
