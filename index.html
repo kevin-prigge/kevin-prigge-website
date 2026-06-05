@@ -899,7 +899,7 @@
     );
 
     chart.chartContainer.get('background').setAll({
-      fill: am5.color(0x1A1208),
+      fill: am5.color(0xF7F1E7),
       fillOpacity: 1
     });
 
@@ -912,9 +912,9 @@
 
     function deployColor(v) {
       if (v >= 6) return am5.color(0x8B6A3A);
-      if (v >= 4) return am5.color(0xB8956A);
-      if (v >= 2) return am5.color(0xC9A97C);
-      return am5.color(0xD4BFA0);
+      if (v >= 4) return am5.color(0xA88252);
+      if (v >= 2) return am5.color(0xC39A67);
+      return am5.color(0xD9BB92);
     }
 
     // Strip out Americas + Oceania so the map only shows Europe/Africa/Middle East/Asia
@@ -945,11 +945,11 @@
 
     // Base style for all countries
     polygonSeries.mapPolygons.template.setAll({
-      fill: am5.color(0x2C1F0E),
-      fillOpacity: 0.65,
-      stroke: am5.color(0x453018),
-      strokeWidth: 0.5,
-      strokeOpacity: 0.8,
+      fill: am5.color(0xE6DCCB),
+      fillOpacity: 0.9,
+      stroke: am5.color(0xA17E53),
+      strokeWidth: 0.7,
+      strokeOpacity: 0.9,
       interactive: true,
       templateField: 'polygonSettings'
     });
@@ -957,7 +957,7 @@
     // Hover state
     polygonSeries.mapPolygons.template.states.create('hover', {
       strokeWidth: 1.8,
-      stroke: am5.color(0xF0D9B5),
+      stroke: am5.color(0x5B432A),
       strokeOpacity: 1
     });
 
@@ -981,7 +981,7 @@
         polygonSettings: {
           fill: deployColor(c),
           fillOpacity: 0.9,
-          stroke: am5.color(0xF0D9B5),
+          stroke: am5.color(0x6C4D2F),
           strokeWidth: 0.8
         }
       };
