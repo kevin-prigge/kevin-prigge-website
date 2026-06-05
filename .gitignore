@@ -1,6 +1,7 @@
 .DS_Store
 Thumbs.db
 *.py
+.github/
 
 /Icon
 /Icon?
